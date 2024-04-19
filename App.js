@@ -278,7 +278,7 @@ export default function App() {
         <NavigationContainer>
             <Stack.Navigator initialRouteName="startup">
                 <Stack.Screen name="startup" component={Homescreen} />
-                <Stack.Screen name="select" component={Selectpage} />
+                <Stack.Screen name="select" component={Selectpage} options={{ headerShown: false }} />
                 <Stack.Screen name="currentR">
                     {(props) => <CurrentRecipes {...props} names={names} />}
                 </Stack.Screen>
@@ -288,7 +288,7 @@ export default function App() {
                 </Stack.Screen>
                 <Stack.Screen name="references" component={Reference} />
 
-                <Stack.Screen name="about" component={About} />
+                <Stack.Screen name="about" component={About}  />
             </Stack.Navigator>
         </NavigationContainer>
 
@@ -368,4 +368,5 @@ const styles = StyleSheet.create({
     },
 
 });
+
 
