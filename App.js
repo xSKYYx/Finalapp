@@ -35,7 +35,7 @@ const Selectpage = ({ navigation }) => {
     const CurrentRecipe = () => { navigation.navigate('currentR'); };
     const CreateNew = () => { navigation.navigate('CreateNew', { navigation }); }; // Pass the navigation prop
     const Reference = () => { navigation.navigate('references'); };
-
+    const About = () => { navigation.navigate('about'); };
     return (
         <ImageBackground
             source={require('./images/background.png')}
@@ -44,7 +44,7 @@ const Selectpage = ({ navigation }) => {
 
 
             <View style={styles.container}>
-                <Text style={{ fontSize: 30, marginBottom: 40, fontWeight:'900' }}>PLEASE SELECT</Text>
+                <Text style={{ fontSize: 30, marginBottom: 40, fontWeight: '900', marginTop: 120 }}>PLEASE SELECT</Text>
 
                 <View style={{ backgroundColor: '#A60D94', width: 350, height: 75, borderRadius: 10, marginBottom: 17, justifyContent: 'center' }}>
                     <Button title="Current Recipes" onPress={CurrentRecipe} color="#13F2DF" />
@@ -54,7 +54,12 @@ const Selectpage = ({ navigation }) => {
             </View>
                 <View style={{ backgroundColor: '#A60D94', width: 350, height: 75, borderRadius: 10, marginBottom: 17, justifyContent: 'center' }}>
                     <Button title="Online References" onPress={Reference} color="#13F2DF"/>
-            </View>
+                </View>
+
+                <View style={{ backgroundColor: '#A60D94', width: 350, height: 75, borderRadius: 10, marginBottom: 17, justifyContent: 'center' }}>
+                    <Button title="About" onPress={About} color="#13F2DF" />
+                </View>
+
             </View>
         </ImageBackground>
     );
@@ -130,7 +135,6 @@ const CurrentRecipes = ({ navigation }) => {
     );
 };
 
-
 const CreateNewRecipe = ({ navigation, setNames }) => {
     const [recipeName, setRecipeName] = useState('');
     const [ingredients, setIngredients] = useState('');
@@ -199,19 +203,18 @@ const CreateNewRecipe = ({ navigation, setNames }) => {
     );
 };
 
-
-const MyLink = ({ url, text }) => {
-    const handlePress = () => {
-        Linking.openURL(url);
-    };
-    return (
-        <TouchableOpacity onPress={handlePress}>
-            <Text style={{ color: 'blue' }}>{text}</Text>
-        </TouchableOpacity>
-    );
-};
-
 const Reference = ({ navigation }) => {
+
+    const MyLink = ({ url, text }) => {
+        const handlePress = () => {
+            Linking.openURL(url);
+        };
+        return (
+            <TouchableOpacity onPress={handlePress}>
+                <Text style={{ color: 'blue' }}>{text}</Text>
+            </TouchableOpacity>
+        );
+    };
     return (
         <ImageBackground
             source={require('./images/background2.png')}
@@ -219,33 +222,55 @@ const Reference = ({ navigation }) => {
         >
             <View>
                 <Text style={{ top: '', fontSize: 30, fontWeight: '900', textDecorationLine: 'underline', color: 'blue', marginBottom: 10 }}>External Reference Page</Text>
-                <Text style={{ top: '', fontSize: 15, fontWeight: '200', color: 'red', marginBottom: 100 }}>Below are links to websites that provide Recipe ideas</Text>
+                <Text style={{ top: '', fontSize: 15, fontWeight: '200', color: 'red', marginBottom: 10 }}>Below are links to websites that provide Recipe ideas</Text>
 
+                <View style={styles.linkbox} >
                 <View style={{ marginTop: '' }}>
-                    <Text style={{ fontSize: 20 }}>Pinterest:</Text>
+                    <Text style={{ fontSize: 35, fontWeight: '800' }}>Pinterest:</Text>
                     <MyLink url="https://ca.pinterest.com/ideas/food-and-drink/918530398158/" text="LINK" />
                 </View>
                 <View style={{ marginTop: 10 }}>
-                    <Text style={{ fontSize: 20 }}>Another Website:</Text>
-                    <MyLink url="https://example.com" text="LINK" />
+                    <Text style={{ fontSize: 35, fontWeight: '800' }}>Allrecipes:</Text>
+                    <MyLink url="https://www.allrecipes.com/" text="LINK" />
                 </View>
 
                 <View style={{ marginTop: 10 }}>
-                    <Text style={{ fontSize: 20 }}>Another Website:</Text>
-                    <MyLink url="https://example.com" text="LINK" />
+                    <Text style={{ fontSize: 35, fontWeight: '800' }}>Simply RECIPES:</Text>
+                    <MyLink url="https://www.simplyrecipes.com/" text="LINK" />
                 </View>
 
                 <View style={{ marginTop: 10 }}>
-                    <Text style={{ fontSize: 20 }}>Another Website:</Text>
-                    <MyLink url="https://example.com" text="LINK" />
+                    <Text style={{ fontSize: 35,  fontWeight: '800' }}>epicurious:</Text>
+                    <MyLink url="https://www.epicurious.com/m" text="LINK" />
                 </View>
-               
+
+                <View style={{ marginTop: 10 }}>
+                    <Text style={{ fontSize: 35, fontWeight: '800' }}>Pinch of Yum:</Text>
+                    <MyLink url="https://www.epicurious.com/m" text="LINK" />
+                </View>
+               </View>
             </View>
         </ImageBackground>
     );
 };
 
+const About = ({navigation}) => {
 
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>About Us</Text>
+            <View style={styles.section}>
+                <Text style={styles.subtitle}>App Developer (Lethbridge college CIT)</Text>
+                <Text style={styles.text}>Skyler Black</Text>
+            </View>
+            <View style={styles.section}>
+                <Text style={styles.subtitle}>Version</Text>
+                <Text style={styles.text}>1.0.0</Text>
+            </View>
+        </View>
+        )
+
+}
 
 export default function App() {
     const [names, setNames] = useState([]);
@@ -262,6 +287,8 @@ export default function App() {
                     {(props) => <CreateNewRecipe {...props} setNames={names} />}
                 </Stack.Screen>
                 <Stack.Screen name="references" component={Reference} />
+
+                <Stack.Screen name="about" component={About} />
             </Stack.Navigator>
         </NavigationContainer>
 
@@ -313,6 +340,32 @@ const styles = StyleSheet.create({
        paddingBottom: 20,
         top: 30
     },
-});
 
+    linkbox: {
+        borderWidth: 3,
+        borderRadius: 12,
+        backgroundColor: '#dcfce4',
+        height: 500,
+
+
+    },
+
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    section: {
+        marginBottom: 20,
+    },
+    subtitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    text: {
+        fontSize: 16,
+    },
+
+});
 
