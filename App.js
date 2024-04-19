@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, TextInput, Alert, Vibration, Platform, ImageBackground, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, Alert, Vibration, Platform, ImageBackground, ActivityIndicator, TouchableOpacity, Linking, ScrollView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator , useNavigation} from '@react-navigation/native-stack';
 import React, { useState, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
 
 const Stack = createNativeStackNavigator();
+
 const Homescreen = ({ navigation }) => {
     const EnterBook = () => { navigation.navigate('select'); };
     const instructions = { AppInstructions: 'View recipes you have or store new ones that you have create. Have fun cooking!' };
@@ -45,13 +46,13 @@ const Selectpage = ({ navigation }) => {
             <View style={styles.container}>
                 <Text style={{ fontSize: 30, marginBottom: 40, fontWeight:'900' }}>PLEASE SELECT</Text>
 
-                <View style={{ backgroundColor: '#A60D94', width: 200, height: 50, borderRadius: 10, marginBottom: 17 }}>
+                <View style={{ backgroundColor: '#A60D94', width: 350, height: 75, borderRadius: 10, marginBottom: 17, justifyContent: 'center' }}>
                     <Button title="Current Recipes" onPress={CurrentRecipe} color="#13F2DF" />
             </View>
-                <View style={{ backgroundColor: '#A60D94', width: 200, height: 50, borderRadius: 10, marginBottom: 17 }}>
+                <View style={{ backgroundColor: '#A60D94', width: 350, height: 75, borderRadius: 10, marginBottom: 17, justifyContent: 'center' }}>
                     <Button title="Create Recipe" onPress={CreateNew} color="#13F2DF"/>
             </View>
-                <View style={{ backgroundColor: '#A60D94', width: 200, height: 50, borderRadius: 10, marginBottom: 17 }}>
+                <View style={{ backgroundColor: '#A60D94', width: 350, height: 75, borderRadius: 10, marginBottom: 17, justifyContent: 'center' }}>
                     <Button title="Online References" onPress={Reference} color="#13F2DF"/>
             </View>
             </View>
@@ -59,7 +60,19 @@ const Selectpage = ({ navigation }) => {
     );
 };
 
-const CurrentRecipes = ({ names }) => {
+const CurrentRecipes = ({ navigation }) => {
+    const [setNames] = useState([]);
+    const { names } = navigation.navigate
+
+    const TextDisplay = ({ label, value }) => {
+        return (
+            <View style={''}>
+                <Text style={styles.label}>{label}</Text>
+                <Text style={styles.value}>{value}</Text>
+            </View>
+        );
+    };
+
 
     const showRecipe = () => {
         if (!names || names.length === 0) {
@@ -67,79 +80,85 @@ const CurrentRecipes = ({ names }) => {
         }
         return names.map((name, index) => {
             return (
+
                 <View key={index}>
                     <Text>name:{name.name}</Text>
                     <Text>Ingredients: {name.ingredients}</Text>
                     <Text>Instructions: {name.instructions}</Text>
                 </View>
+
             );
         });
     };
 
+
     return (
+        //these are examples of how it could or was suppost to look like when the data is pass through one page to this one page within this view.
         <ImageBackground source={require('./images/background2.png')} style={styles.backgroundImage2}>
-            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                {showRecipe()}
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.box}>
+                <TextDisplay label="Name:" value="chocolate chip cookies" />
+                <TextDisplay label="Ingredients:" value="flours, eggs, salt, butter, baking soda, choco chips, vanilla abstract." />
+                <TextDisplay label="Instructions:" value="1: mix all the ingredients in a orderly fashion. 2: mix well until it is doe, and then put in oven for 12 mins, let it set for 4 mins, and then enjoy" />
+
             </View>
+            <View style={styles.box}>
+                <TextDisplay label="Name:" value="chocolate chip cookies" />
+                <TextDisplay label="Ingredients:" value="flours, eggs, salt, butter, baking soda, choco chips, vanilla abstract." />
+                <TextDisplay label="Instructions:" value="1: mix all the ingredients in a orderly fashion. 2: mix well until it is doe, and then put in oven for 12 mins, let it set for 4 mins, and then enjoy" />
+
+            </View>
+            <View style={styles.box}>
+                <TextDisplay label="Name:" value="example" />
+                <TextDisplay label="Ingredients:" value="example" />
+                <TextDisplay label="Instructions:" value=" example" />
+
+            </View>
+            <View style={styles.box}>
+                <TextDisplay label="Name:" value="example" />
+                <TextDisplay label="Ingredients:" value="example." />
+                <TextDisplay label="Instructions:" value="example" />
+            </View>
+
+
+                <View style={styles.box}>
+              {showRecipe()}
+            </View>
+
+            </ScrollView>
         </ImageBackground>
     );
 };
 
 
-const CreateNewRecipe = ({ navigation }) => {
+const CreateNewRecipe = ({ navigation, setNames }) => {
     const [recipeName, setRecipeName] = useState('');
     const [ingredients, setIngredients] = useState('');
     const [instructions, setInstructions] = useState('');
     const [isLoading, setIsLoading] = useState(true);
-    const [names, setNames] = useState([]); // Define names state
 
     const db = SQLite.openDatabase('db.db');
 
-    useEffect(() => {
-        // Initialize the database
-
-        // Create the table if not exists
-        db.transaction(tx => {
-            tx.executeSql('CREATE TABLE IF NOT EXISTS names (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, ingredients TEXT, instructions TEXT)');
-        });
-
-        // Fetch existing recipes
-        db.transaction(tx => {
-            tx.executeSql('SELECT * FROM names', [], (_, { rows }) => {
-                const data = rows._array;
-                setNames(data);
-                setIsLoading(false);
-            });
-        });
-
-        // Close the database connection when component unmounts
-       
-    }, []);
-
     const handleStoreRecipe = () => {
-        // Insert new recipe into the database
         db.transaction(tx => {
             tx.executeSql(
                 'INSERT INTO names (name, ingredients, instructions) VALUES (?, ?, ?)',
                 [recipeName, ingredients, instructions],
                 (_, { insertId }) => {
-                    // Recipe inserted successfully
                     console.log('Recipe inserted with ID:', insertId);
-                    // Refresh the recipes list
-                    setNames([...names, { id: insertId, name: recipeName, ingredients, instructions }]);
+                    const newRecipe = { id: insertId, name: recipeName, ingredients, instructions };
+                    setNames([...names, newRecipe]); // Update the state with the new recipe
                 },
                 (_, error) => console.error('Error inserting recipe:', error)
             );
         });
 
-        // Show alert when recipe is created
         Alert.alert(
             'Recipe Created',
             'Your recipe has been successfully created!',
             [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
         );
 
-        // Vibrate the device
         Vibration.vibrate();
     };
 
@@ -180,14 +199,52 @@ const CreateNewRecipe = ({ navigation }) => {
     );
 };
 
-const Reference = ({ navigation }) => {
 
+const MyLink = ({ url, text }) => {
+    const handlePress = () => {
+        Linking.openURL(url);
+    };
     return (
-        <View>
-            <Text>External Reference Page</Text>
-        </View>
+        <TouchableOpacity onPress={handlePress}>
+            <Text style={{ color: 'blue' }}>{text}</Text>
+        </TouchableOpacity>
     );
 };
+
+const Reference = ({ navigation }) => {
+    return (
+        <ImageBackground
+            source={require('./images/background2.png')}
+            style={styles.backgroundImage}
+        >
+            <View>
+                <Text style={{ top: '', fontSize: 30, fontWeight: '900', textDecorationLine: 'underline', color: 'blue', marginBottom: 10 }}>External Reference Page</Text>
+                <Text style={{ top: '', fontSize: 15, fontWeight: '200', color: 'red', marginBottom: 100 }}>Below are links to websites that provide Recipe ideas</Text>
+
+                <View style={{ marginTop: '' }}>
+                    <Text style={{ fontSize: 20 }}>Pinterest:</Text>
+                    <MyLink url="https://ca.pinterest.com/ideas/food-and-drink/918530398158/" text="LINK" />
+                </View>
+                <View style={{ marginTop: 10 }}>
+                    <Text style={{ fontSize: 20 }}>Another Website:</Text>
+                    <MyLink url="https://example.com" text="LINK" />
+                </View>
+
+                <View style={{ marginTop: 10 }}>
+                    <Text style={{ fontSize: 20 }}>Another Website:</Text>
+                    <MyLink url="https://example.com" text="LINK" />
+                </View>
+
+                <View style={{ marginTop: 10 }}>
+                    <Text style={{ fontSize: 20 }}>Another Website:</Text>
+                    <MyLink url="https://example.com" text="LINK" />
+                </View>
+               
+            </View>
+        </ImageBackground>
+    );
+};
+
 
 
 export default function App() {
@@ -197,13 +254,12 @@ export default function App() {
             <Stack.Navigator initialRouteName="startup">
                 <Stack.Screen name="startup" component={Homescreen} />
                 <Stack.Screen name="select" component={Selectpage} />
-                <Stack.Screen
-                    name="currentR"
-                    component={CurrentRecipes}
-                    initialParams={{ names: names }}
-                />
+                <Stack.Screen name="currentR">
+                    {(props) => <CurrentRecipes {...props} names={names} />}
+                </Stack.Screen>
+
                 <Stack.Screen name="CreateNew">
-                    {(props) => <CreateNewRecipe {...props} setNames={setNames} />}
+                    {(props) => <CreateNewRecipe {...props} setNames={names} />}
                 </Stack.Screen>
                 <Stack.Screen name="references" component={Reference} />
             </Stack.Navigator>
@@ -228,9 +284,35 @@ const styles = StyleSheet.create({
         flex: 1,
         resizeMode: 'cover',
         
+        alignItems: 'center',
+        justifyContent: 'center',
 
+    },
 
-    }
-   
+    label: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        color: '#333',
+    },
+    value: {
+        fontSize: 13,
+        color: '#666',
+    },
+    box: {
+        borderWidth: 1,
+        width: 200,
+        height: 200,
+        backgroundColor: 'white',
+        borderRadius: 6,
+        margin: 3
+    },
+   scrollContainer: {
+        alignItems: 'center',
+        paddingTop: 100,
+       paddingBottom: 20,
+        top: 30
+    },
 });
+
 
